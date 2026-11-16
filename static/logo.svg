@@ -1,7 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="pqTitle">
   <title id="pqTitle">PocketIQ</title>
-  <!-- A pocket with a bright idea in it: pocket for Pocket, spark for IQ -->
-  <path fill="#c8321f" d="M4 2.5h16A2.5 2.5 0 0 1 22.500 5v8.300c0 2.200-1.150 4.200-3.050 5.300l-5.950 3.400a3 3 0 0 1-3 0L4.550 18.600A6.100 6.100 0 0 1 1.500 13.300V5A2.500 2.500 0 0 1 4 2.500z"/>
-  <path fill="#9c2416" d="M4 2.500h16A2.500 2.500 0 0 1 22.500 5v2.200h-21V5A2.500 2.500 0 0 1 4 2.500z"/>
-  <path fill="#f4cf3a" d="M12 8.900c.550 2.900 1.650 4 4.550 4.550-2.900.550-4 1.650-4.550 4.550-.550-2.900-1.650-4-4.550-4.550 2.900-.550 4-1.650 4.550-4.550z"/>
+  <!-- A pocket with a brain in it: the pocket is your pocket money, the brain is the IQ you bring to it -->
+  <defs>
+    <clipPath id="pqL"><rect x="0" y="0" width="11.55" height="24"/></clipPath>
+    <clipPath id="pqR"><rect x="12.45" y="0" width="11.55" height="24"/></clipPath>
+  </defs>
+  <path fill="#c8321f" d="M4 2.500h16A2.500 2.500 0 0 1 22.500 5v8.300c0 2.200-1.150 4.200-3.050 5.300l-5.950 3.400a3 3 0 0 1-3 0L4.550 18.600A6.100 6.100 0 0 1 1.500 13.300V5A2.500 2.500 0 0 1 4 2.500z"/>
+  <path fill="#9c2416" d="M4 2.500h16A2.500 2.500 0 0 1 22.500 5v1.700h-21V5A2.500 2.500 0 0 1 4 2.500z"/>
+  <g fill="#f4cf3a">
+    <g clip-path="url(#pqL)">
+      <circle cx="10" cy="10.900" r="2.300"/><circle cx="8.300" cy="13.300" r="2.500"/><circle cx="10" cy="15.900" r="2.400"/><rect x="8" y="10" width="4" height="7"/>
+    </g>
+    <g clip-path="url(#pqR)">
+      <circle cx="14" cy="10.900" r="2.300"/><circle cx="15.700" cy="13.300" r="2.500"/><circle cx="14" cy="15.900" r="2.400"/><rect x="12" y="10" width="4" height="7"/>
+    </g>
+  </g>
+  <g fill="none" stroke="#c8321f" stroke-width="0.800" stroke-linecap="round">
+    <path d="M11.500 12.300h-1.200c-.800 0-1.300-.500-1.300-1.250M11.500 15h-1.700c-.850 0-1.400.550-1.400 1.300"/>
+    <path d="M12.500 12.300h1.200c.800 0 1.300-.500 1.300-1.250M12.500 15h1.700c.850 0 1.400.550 1.400 1.300"/>
+  </g>
 </svg>
