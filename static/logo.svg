@@ -1,24 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" role="img" aria-label="PocketIQ">
-  <defs>
-    <linearGradient id="pqGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3B2FA8"/>
-      <stop offset="55%" stop-color="#2D248A"/>
-      <stop offset="100%" stop-color="#16C2A1"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="44" height="44" rx="13" fill="url(#pqGrad)"/>
-
-  <!-- upward trend line -->
-  <path d="M11 29.5 L18.5 22 L23.5 27 L32 17.5"
-        fill="none" stroke="#fff" stroke-width="2.9"
-        stroke-linecap="round" stroke-linejoin="round" opacity="0.96"/>
-
-  <!-- coin at the peak -->
-  <circle cx="32" cy="17.5" r="3.6" fill="#fff"/>
-  <circle cx="32" cy="17.5" r="1.5" fill="#2D248A" opacity="0.9"/>
-
-  <!-- baseline -->
-  <path d="M11 34 H33" stroke="#fff" stroke-width="2.1"
-        stroke-linecap="round" opacity="0.35"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="pqTitle">
+  <title id="pqTitle">PocketIQ</title>
+  <!-- A pocket with a bright idea in it: pocket for Pocket, spark for IQ -->
+  <path fill="#c8321f" d="M4 2.5h16A2.5 2.5 0 0 1 22.500 5v8.300c0 2.200-1.150 4.200-3.050 5.300l-5.950 3.400a3 3 0 0 1-3 0L4.550 18.600A6.100 6.100 0 0 1 1.500 13.300V5A2.500 2.500 0 0 1 4 2.500z"/>
+  <path fill="#9c2416" d="M4 2.500h16A2.500 2.500 0 0 1 22.500 5v2.200h-21V5A2.500 2.500 0 0 1 4 2.500z"/>
+  <path fill="#f4cf3a" d="M12 8.900c.550 2.900 1.650 4 4.550 4.550-2.900.550-4 1.650-4.550 4.550-.550-2.900-1.650-4-4.550-4.550 2.900-.550 4-1.650 4.550-4.550z"/>
 </svg>

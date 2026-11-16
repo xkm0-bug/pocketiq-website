@@ -5,17 +5,18 @@
   </a>
 
   <nav class="banner-nav" aria-label="Primary">
-    <a href="/mobo/learning" class="nav-link {% if '/mobo/learning' in request.path %}active{% endif %}">Learn</a>
-    <a href="/mobo/decision" class="nav-link {% if '/mobo/decision' in request.path %}active{% endif %}">Decide</a>
-    <a href="/mobo/compare" class="nav-link {% if '/mobo/compare' in request.path %}active{% endif %}">Compare</a>
-    <a href="/about" class="nav-link {% if request.path == '/about' %}active{% endif %}">About</a>
+    <a href="/mobo/learning" class="nav-link {% if '/mobo/learning' in request.path %}active{% endif %}" {% if '/mobo/learning' in request.path %}aria-current="page"{% endif %}>Learn</a>
+    <a href="/mobo/decision" class="nav-link {% if '/mobo/decision' in request.path %}active{% endif %}" {% if '/mobo/decision' in request.path %}aria-current="page"{% endif %}>Decide</a>
+    <a href="/mobo/compare" class="nav-link {% if '/mobo/compare' in request.path %}active{% endif %}" {% if '/mobo/compare' in request.path %}aria-current="page"{% endif %}>Compare</a>
+    <a href="/tools" class="nav-link {% if request.path == '/tools' %}active{% endif %}" {% if request.path == '/tools' %}aria-current="page"{% endif %}>Tools</a>
+    <a href="/about" class="nav-link {% if request.path == '/about' %}active{% endif %}" {% if request.path == '/about' %}aria-current="page"{% endif %}>About</a>
   </nav>
 
   <div class="banner-right">
     {% if request.path == "/" %}
     <a href="/mobo/learning" class="pq-btn sm">Open MoBo</a>
     {% else %}
-    <a href="/" class="pq-btn sm ghost">Home</a>
+    <a href="/" class="pq-btn sm">Home</a>
     {% endif %}
   </div>
 </header>

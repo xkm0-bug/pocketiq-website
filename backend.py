@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 from urllib.parse import quote_plus
 
 try:
@@ -14,6 +14,8 @@ from flask import Flask, jsonify, render_template, request, session
 from flask_session import Session
 from openai import OpenAI
 from serpapi import GoogleSearch
+
+from starter_content import STARTER_LESSONS, STARTER_ROADMAP
 
 # Absolute paths everywhere: under a WSGI server (PythonAnywhere) the working
 # directory is NOT the project folder, so anything relying on os.getcwd() ends
@@ -29,41 +31,77 @@ MAX_CHAT_HISTORY_MESSAGES = 12
 # design; update this and the matching copy in mobo.html when it drifts.
 USD_TO_INR = 95
 
-# Every model-facing prompt gets this so generated copy avoids the em-dash
-# "AI tell" and reads more naturally.
+# Every model-facing prompt gets these two. The first avoids the em-dash habit;
+# the second is the house voice, so MoBo sounds like a person who is good with
+# money rather than a brochure.
 NO_EM_DASH = "Do not use em dashes in your writing. Use commas, colons, or separate sentences instead."
+VOICE = (
+    "Voice: write like a sensible older cousin who is good with money, talking to a teenager in India. "
+    "Short sentences. Say the useful thing first. Use specific rupee amounts sized to pocket money "
+    "(₹15 samosas, ₹299 recharges, ₹1,500 a month), not vague advice. "
+    "Never open with phrases like 'In today's world', 'Great question' or 'Let's dive in'. "
+    "Avoid 'it's important to', 'remember that', 'financial journey', 'empower', 'unlock' and 'game-changer'. "
+    "No emojis and no exclamation marks. Do not praise or flatter the reader. "
+    "If something is boring but matters, say so plainly. "
+    + NO_EM_DASH
+)
 
 DECISION_FALLBACK_RESPONSE = (
-    "I can still help you think this through. Share the item, its price, how often you'll use it, "
-    "and whether it replaces something you already own, and I'll help you decide if it's worth it."
+    "I can't reach my brain right now, so I can't ask you the usual questions. "
+    "Until I'm back, try this: wait 24 hours, then ask whether you'd still pay for it in cash. "
+    "The Tools page can also show what it costs you over a year."
 )
 LEARNING_FALLBACK_RESPONSE = (
-    "I'm having trouble reaching my brain right now. Try asking again in a moment, and "
-    "meanwhile, keep reading your current roadmap step and jot down anything confusing."
+    "I couldn't get through just then. Give it a minute and ask again. "
+    "If it keeps failing, carry on with the lesson and note down the bit that's confusing."
 )
 
-# Learning Mode uses its own tutor persona and its own session history so it never
+# Learning has its own tutor persona and its own session history, so it never
 # collides with (or inherits the purchase-only guardrails of) the Decision coach.
 LEARNING_SYSTEM_PROMPT = (
-    "You are MoBo, a friendly financial-literacy tutor inside PocketIQ's Learning Mode.\n\n"
-    "You help teens and young adults understand money concepts of every kind: budgeting, saving, "
-    "investing, credit, loans, taxes, inflation, interest, banking, UPI, insurance, careers and income, "
-    "scams and safety, and general money habits.\n\n"
-    "Behaviour rules:\n"
-    "1. Answer the learner's question directly and clearly. Lead with the answer, then explain.\n"
-    "2. Keep replies short, 2 to 5 sentences, unless the learner asks for more depth.\n"
-    "3. Use simple language and relatable Indian examples in INR (₹): pocket money, UPI, recharges, "
-    "snacks, subscriptions, travel, first jobs.\n"
-    "4. If the learner is currently reading a roadmap step, connect your answer back to that step "
-    "when it is relevant.\n"
-    "5. IMPORTANT: You are NOT the purchase-decision coach. Never refuse or deflect a question just "
-    "because it is not about buying something. Questions about concepts, definitions, examples, "
-    "calculations, study help, or 'how does X work' are all squarely your job.\n"
-    "6. Only redirect if a question is genuinely unrelated to money, finance, or the learner's studies.\n"
-    "7. Never invent specific real-world returns, guaranteed rates, or personalised investment advice. "
-    "Explain how things work instead, and suggest talking to a trusted adult for big decisions.\n\n"
-    "Tone: encouraging, patient and plain-spoken, a good teacher who never makes anyone feel dumb.\n"
-    + NO_EM_DASH
+    "You are MoBo, the tutor inside PocketIQ's Learning mode.\n\n"
+    "You help teenagers and young adults in India understand money: budgeting, saving, investing, "
+    "credit, loans, taxes, inflation, interest, banking, UPI, insurance, earning, scams, and everyday "
+    "money habits.\n\n"
+    "Rules:\n"
+    "1. Answer the question directly. Lead with the answer, then explain.\n"
+    "2. Keep replies to 2 to 5 sentences unless the learner asks for more.\n"
+    "3. Use everyday Indian examples in rupees: pocket money, UPI, recharges, canteen snacks, "
+    "subscriptions, bus fare, a first job.\n"
+    "4. If the learner is reading a roadmap step, tie your answer back to it when that helps.\n"
+    "5. You are NOT the purchase-decision coach. Never deflect a question because it isn't about "
+    "buying something. Concepts, definitions, examples, calculations and 'how does X work' are your job.\n"
+    "6. Only redirect if a question has nothing to do with money or the learner's studies.\n"
+    "7. Never invent real-world returns, guaranteed rates or personal investment advice. Explain how "
+    "things work, and suggest talking to a trusted adult before any big decision.\n"
+    "8. If the learner sounds confused, try a different example instead of repeating the same one.\n\n"
+    + VOICE
+)
+
+DECISION_SYSTEM_PROMPT = (
+    "You are MoBo, the PocketIQ decision coach. You help teenagers and young adults in India decide "
+    "whether something they want to buy is actually worth it.\n\n"
+    "How a conversation goes:\n"
+    "1. When they mention wanting something, ask clarifying questions ONE AT A TIME. You want to know: "
+    "the price, how much money they have or get each month, why they want it, how often they'd use it, "
+    "and whether it replaces or duplicates something they already own.\n"
+    "2. Skip any question they have already answered. Usually three or four questions is enough.\n"
+    "3. Once you know enough, stop asking and give your final call. It should say whether this looks "
+    "thought-through or impulsive, what else that money could do for them, and your recommendation.\n"
+    "4. End the final call with a last line in exactly this form, using one of the three options:\n"
+    "VERDICT: Go for it\n"
+    "VERDICT: Think twice\n"
+    "VERDICT: Wait and save\n"
+    "Right after the VERDICT line, add one more line naming the thing they're deciding on, "
+    "in two to five words with no price, like:\n"
+    "ITEM: New wireless earbuds\n"
+    "Never write a VERDICT or ITEM line before the final call.\n"
+    "5. After the final call, do not ask more questions. If they push back, answer briefly and "
+    "only change the verdict if they give you new information.\n\n"
+    "Be honest. Sometimes the right answer is to buy it, and you should say so without hedging. "
+    "Never lecture or make them feel judged for wanting something. "
+    "Keep every message under 90 words. Stay on purchase decisions only.\n\n"
+    + VOICE
 )
 
 
@@ -100,6 +138,12 @@ def create_app():
 
 app = create_app()
 
+
+@app.context_processor
+def inject_current_year():
+    """Lets templates print the real year (the shared footer used a hardcoded one)."""
+    return {"current_year": datetime.now().year}
+
 # ------------------- OPENAI CLIENT -------------------
 
 def get_openai_client():
@@ -135,7 +179,7 @@ def build_compare_fallback(item1, item2):
         "price1_inr": None,
         "price2_inr": None,
         "ratio": 0,
-        "note": "Live price comparison is unavailable right now. Add SERPAPI_API_KEY to re-enable shopping data.",
+        "note": "Live prices aren't available right now, so there's nothing to compare. Try again later.",
     }
 
 
@@ -220,9 +264,11 @@ def build_article_cache_key(topic, context, step_summary):
 
 # ------------------- ROUTES -------------------
 
+
 @app.route('/')
 def home():
     return render_template('home.html')
+
 
 @app.route('/mobo/<mode>')
 def mobo_mode(mode):
@@ -230,49 +276,28 @@ def mobo_mode(mode):
         mode = "learning"
     return render_template("mobo.html", mode=mode)
 
+
+@app.route('/tools')
+def tools():
+    return render_template('tools.html')
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')
 
-# ------------------- DECISION CHATBOT -------------------
+
+# ------------------- DECISION COACH -------------------
 
 @app.route('/ask', methods=['POST'])
 def ask():
     message = request.form.get('message', '').strip()
     if not message:
-        return jsonify({'response': "Please type something."})
+        return jsonify({'response': "Type what you're thinking of buying and I'll take it from there."})
 
-    # Initialize chat history if new
     if 'chat_history' not in session:
-        session['chat_history'] = [
-            {"role": "system", "content":
-"You are MoBo, the PocketIQ decision coach. "
-"You help teens and young adults decide whether a purchase is truly worth it.\n\n"
+        session['chat_history'] = [{"role": "system", "content": DECISION_SYSTEM_PROMPT}]
 
-"Behavior rules:\n"
-"1. When the user mentions wanting to buy something, ask clarifying questions ONE AT A TIME to fully understand:\n"
-"   - the price or budget,\n"
-"   - the user’s motivation,\n"
-"   - how often it will be used,\n"
-"   - whether this replaces or duplicates something they already own,\n"
-"   - and any financial constraints they mention.\n"
-"2. Ask as MANY questions as necessary UNTIL you have enough information to make a confident judgment.\n"
-"3. Once you have enough information, STOP asking questions and give a FINAL evaluation that includes:\n"
-"   - whether the purchase seems thoughtful or impulsive,\n"
-"   - what else the money could realistically be used for or saved toward,\n"
-"   - a clear recommendation: Go for it / Think twice / Wait and save.\n"
-"4. Clearly signal when you are giving the FINAL evaluation.\n"
-"5. After giving the final evaluation, DO NOT ask further questions.\n\n"
-
-"Tone: friendly, practical, and non-judgmental, like a financially wise older friend. "
-"Use relatable examples in INR (₹), such as snacks, subscriptions, phone recharges, or travel.\n"
-"Stay strictly focused on purchase decisions only.\n"
-"Do not use em dashes in your writing. Use commas, colons, or separate sentences instead."
-}
-
-        ]
-
-    # Append new user message
     chat_history = session['chat_history']
     chat_history.append({"role": "user", "content": message})
 
@@ -285,7 +310,6 @@ def ask():
         )
         reply = response.choices[0].message.content.strip()
 
-        # Append bot response to memory
         chat_history.append({"role": "assistant", "content": reply})
         if len(chat_history) > MAX_CHAT_HISTORY_MESSAGES:
             chat_history = [chat_history[0]] + chat_history[-(MAX_CHAT_HISTORY_MESSAGES - 1):]
@@ -294,13 +318,16 @@ def ask():
         return jsonify({'response': reply})
 
     except Exception as e:
-        print("Ask Error:", e)
-        return jsonify({'response': DECISION_FALLBACK_RESPONSE})
+        print("Ask error:", e)
+        # Drop the message we just appended, so a retry doesn't send it twice.
+        chat_history.pop()
+        session['chat_history'] = chat_history
+        return jsonify({'response': DECISION_FALLBACK_RESPONSE, 'offline': True})
 
 
 @app.route('/reset_chat', methods=['POST'])
 def reset_chat():
-    """Clear a conversation so the user can start a fresh decision.
+    """Clear a conversation so the user can start fresh.
 
     Defaults to the decision chat; pass scope=learning or scope=all to clear
     the tutor history instead. The two histories are deliberately separate.
@@ -315,7 +342,7 @@ def reset_chat():
     return jsonify({'ok': True, 'cleared': scope})
 
 
-# ------------------- LEARNING ASSISTANT (separate from Decision) -------------------
+# ------------------- LEARNING TUTOR (separate from Decision) -------------------
 
 @app.route('/ask_learning', methods=['POST'])
 def ask_learning():
@@ -324,19 +351,19 @@ def ask_learning():
     context = request.form.get('context', '').strip()
 
     if not message:
-        return jsonify({'response': "Please type something."})
+        return jsonify({'response': "Type a question and I'll have a go at it."})
 
     if 'learning_chat_history' not in session:
         system_prompt = LEARNING_SYSTEM_PROMPT
         if context:
-            system_prompt += f"\n\nThe learner described their background as: {context}"
+            system_prompt += f"\n\nThe learner described their situation as: {context}"
         session['learning_chat_history'] = [
             {"role": "system", "content": system_prompt}
         ]
 
     chat_history = session['learning_chat_history']
 
-    # Give the tutor awareness of which roadmap step the learner is on.
+    # Tell the tutor which roadmap step the learner has open.
     user_content = message
     if topic:
         user_content = f"[The learner is currently reading the roadmap step: \"{topic}\"]\n\n{message}"
@@ -360,11 +387,25 @@ def ask_learning():
         return jsonify({'response': reply})
 
     except Exception as e:
-        print("Ask Learning Error:", e)
-        return jsonify({'response': LEARNING_FALLBACK_RESPONSE})
+        print("Ask learning error:", e)
+        chat_history.pop()
+        session['learning_chat_history'] = chat_history
+        return jsonify({'response': LEARNING_FALLBACK_RESPONSE, 'offline': True})
 
 
-# ------------------- LEARNING MODE -------------------
+# ------------------- LEARNING: ROADMAP AND LESSONS -------------------
+
+def clean_roadmap(raw):
+    """Keep only well-formed steps, so one bad item can't break the page."""
+    steps = []
+    for item in raw if isinstance(raw, list) else []:
+        if not isinstance(item, dict):
+            continue
+        title = str(item.get("title", "")).strip()
+        if title:
+            steps.append({"title": title, "summary": str(item.get("summary", "")).strip()})
+    return steps[:10]
+
 
 @app.route('/generate_roadmap', methods=['POST'])
 def generate_roadmap():
@@ -373,93 +414,18 @@ def generate_roadmap():
         return jsonify({"error": "Missing context"}), 400
 
     prompt = (
-        "You are MoBo, a financial literacy mentor for teenagers.\n\n"
-        f"User background:\n{context}\n\n"
-        "Create a personalized 8-10 step roadmap to improve their financial knowledge.\n"
-        "Start from their current level and gradually advance.\n\n"
-        "IMPORTANT:\n"
-        "- Return ONLY valid JSON\n"
-        "- No explanation, no text before or after\n"
-        "- Do not use em dashes in the titles or summaries\n"
-        "- Format EXACTLY like this:\n"
-        "[{\"title\": \"...\", \"summary\": \"...\"}, ...]"
-    )
-
-    try:
-        client = get_openai_client()
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=500
-        )
-
-        text = response.choices[0].message.content.strip()
-        print("🔍 RAW MODEL OUTPUT:\n", text)  # DEBUG
-
-        roadmap = []
-
-        # ✅ Attempt 1: direct JSON
-        try:
-            roadmap = json.loads(text)
-        except:
-            # ✅ Attempt 2: extract JSON block
-            match = re.search(r'\[.*\]', text, re.S)
-            if match:
-                roadmap = json.loads(match.group(0))
-
-        # ✅ Validate result
-        if not isinstance(roadmap, list) or len(roadmap) < 3:
-            raise ValueError("Invalid roadmap format")
-
-        print("✅ Roadmap parsed successfully")
-        return jsonify({"roadmap": roadmap})
-
-    except Exception as e:
-        print("❌ Roadmap error:", e)
-
-        # 🔥 fallback (ONLY if truly failed)
-        fallback = [
-            {"title": "Budgeting Basics", "summary": "Learn how to plan and track expenses each month."},
-            {"title": "Saving Goals", "summary": "Understand short- and long-term savings."},
-            {"title": "Smart Spending", "summary": "Differentiate between needs and wants."},
-            {"title": "Intro to Investing", "summary": "Explore mutual funds and compounding."},
-            {"title": "Credit & Taxes", "summary": "Understand credit, loans, and taxes."}
-        ]
-
-        return jsonify({"roadmap": fallback})
-    
-@app.route('/generate_article', methods=['POST'])
-def generate_article():
-    topic = request.form.get('topic', '').strip()
-    context = request.form.get('context', '').strip()
-    step_summary = request.form.get('summary', '').strip()
-    cache_key = build_article_cache_key(topic, context, step_summary)
-
-    if cache_key in ARTICLE_CACHE:
-        return jsonify({'article': ARTICLE_CACHE[cache_key]})
-
-    if not topic:
-        return jsonify({'article': "⚠️ No topic provided."})
-
-    context_block = ""
-    if context:
-        context_block += f"Original learner goal/context: {context}\n"
-    if step_summary:
-        context_block += f"Roadmap step summary: {step_summary}\n"
-
-    prompt = (
-        f"You are MoBo, a financial mentor for Indian teenagers.\n\n"
-        f"{context_block}\n"
-        f"Explain the roadmap step: '{topic}' in about 200-250 words.\n"
-        "Keep the explanation tightly aligned with the learner's original goal and this roadmap step.\n"
-        "If the learner mentioned a country, market, product type, or objective, explicitly include it in the explanation.\n"
-        "Do not drift into generic advice that ignores the learner context.\n"
-        "DO NOT include the title in the response.\n"
-        "Start directly with the explanation.\n"
-        "Use simple language and real-life examples (pocket money, savings, UPI, etc).\n"
-        "Use INR (₹) for all examples, unless otherwise specified.\n"
-        "Give PRACTICAL tips and ACTIONABLE advice related to the topic.\n"
-        "End with 2-3 key takeaways.\n"
+        "You are MoBo, a money mentor for teenagers in India.\n\n"
+        f"Here is how the learner describes their situation:\n{context}\n\n"
+        "Plan a personal roadmap of 8 to 10 steps that takes them from where they are now to "
+        "noticeably more capable with money. Start at their actual level. If they already save, "
+        "do not start with 'what is saving'. Order the steps so each one builds on the last, and "
+        "make sure anything they said they want to get better at is covered.\n\n"
+        "Each step has:\n"
+        "- title: under 6 words, plain and specific, like a friend would say it. No 'Mastering', "
+        "'Unlocking', '101', 'Basics of' or colons.\n"
+        "- summary: one sentence under 18 words saying what they will be able to do afterwards.\n\n"
+        "Return ONLY valid JSON, with nothing before or after it, in exactly this shape:\n"
+        "[{\"title\": \"...\", \"summary\": \"...\"}, ...]\n"
         + NO_EM_DASH
     )
 
@@ -468,43 +434,118 @@ def generate_article():
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=400
+            max_tokens=700
         )
+        text = response.choices[0].message.content.strip()
+
+        try:
+            roadmap = json.loads(text)
+        except ValueError:
+            # The model sometimes wraps the JSON in a code fence or a sentence.
+            match = re.search(r'\[.*\]', text, re.S)
+            roadmap = json.loads(match.group(0)) if match else []
+
+        roadmap = clean_roadmap(roadmap)
+        if len(roadmap) < 3:
+            raise ValueError("Roadmap came back empty or malformed")
+
+        return jsonify({"roadmap": roadmap})
+
+    except Exception as e:
+        print("Roadmap error:", e)
+        # The hand-written starter roadmap, so Learning mode still works offline.
+        return jsonify({"roadmap": STARTER_ROADMAP, "offline": True})
 
 
-        article = (
-            response.choices[0].message.content.strip()
-            if response and response.choices
-            else None
+LESSON_LEVELS = {
+    "standard": (
+        "Write 170 to 220 words. Use plain paragraphs, with at most one short bulleted list. "
+        "Include one worked example with real rupee amounts."
+    ),
+    "simpler": (
+        "Explain it as if to a 12 year old who has never heard the term. Under 150 words. "
+        "One everyday example. Do not use a finance word without explaining it in the same sentence."
+    ),
+    "deeper": (
+        "Go one level deeper than a beginner lesson, in 250 to 300 words. Explain why it works, "
+        "show a worked calculation with rupee amounts, and name one mistake people commonly make."
+    ),
+}
+
+
+def offline_lesson(topic):
+    """A hand-written lesson if we have one for this step, otherwise an honest placeholder."""
+    if topic in STARTER_LESSONS:
+        return STARTER_LESSONS[topic].strip()
+    return (
+        f"MoBo couldn't be reached, so this lesson on **{topic}** hasn't been written yet.\n\n"
+        "Lessons here are written for you when you open them, which needs a working connection "
+        "to the model. Tap **Try again** in a minute.\n\n"
+        "**Meanwhile:** write down the one thing about this topic you'd most like explained. "
+        "When MoBo is back, ask exactly that."
+    )
+
+
+@app.route('/generate_article', methods=['POST'])
+def generate_article():
+    topic = request.form.get('topic', '').strip()
+    context = request.form.get('context', '').strip()
+    step_summary = request.form.get('summary', '').strip()
+    level = request.form.get('level', 'standard').strip()
+    if level not in LESSON_LEVELS:
+        level = "standard"
+
+    if not topic:
+        return jsonify({'article': "There's no lesson selected. Tap a step on your roadmap."})
+
+    cache_key = build_article_cache_key(topic, context, step_summary) + "||" + level
+    if cache_key in ARTICLE_CACHE:
+        return jsonify({'article': ARTICLE_CACHE[cache_key]})
+
+    context_block = ""
+    if context:
+        context_block += f"What the learner said about themselves: {context}\n"
+    if step_summary:
+        context_block += f"What this step is meant to cover: {step_summary}\n"
+
+    prompt = (
+        "You are MoBo, a money mentor for teenagers in India.\n\n"
+        f"{context_block}\n"
+        f"Write the lesson for the roadmap step: '{topic}'.\n"
+        f"{LESSON_LEVELS[level]}\n"
+        "Write it for this particular learner. If they mentioned an amount, a goal or a problem, "
+        "use it in the example instead of a generic one.\n"
+        "Do not repeat the title. Open with a specific situation this learner would recognise from "
+        "their own week, not a definition and not 'let's say' or 'imagine'.\n"
+        "Do not end paragraphs with a moral or a summary sentence. Skip words like 'impulsively', "
+        "'priorities', 'mindful' and 'wisely'.\n"
+        "Use rupees for every amount.\n"
+        "Do not write a 'Key takeaways' section. End with one line that starts with "
+        "'**Try this week:**' followed by a single small action they could actually do.\n"
+        + VOICE
+    )
+
+    try:
+        client = get_openai_client()
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=650
         )
+
+        article = response.choices[0].message.content.strip() if response and response.choices else ""
+        if not article:
+            raise ValueError("Empty lesson")
 
         ARTICLE_CACHE[cache_key] = article
-
-        if not article:
-            raise ValueError("Empty response")
-
         return jsonify({'article': article})
 
     except Exception as e:
-        print("❌ Article error:", e)
+        print("Lesson error:", e)
+        return jsonify({'article': offline_lesson(topic), 'offline': True})
 
-        fallback = f"""
-### {topic}
 
-This topic is important for managing your money wisely.
-
-For example, if you receive ₹1,000 as pocket money, understanding {topic.lower()} can help you decide how much to save, spend, or invest.
-
-Start small, stay consistent, and build habits over time.
-
-**Key Takeaways:**
-- Start early
-- Be consistent
-- Think long-term
-"""
-        return jsonify({'article': fallback})
-
-# ------------------- COMPARE MODE -------------------
+# ------------------- COMPARE -------------------
 
 def get_product_data(query):
     params = {
@@ -521,6 +562,7 @@ def get_product_data(query):
     except Exception:
         return None
 
+
 def parse_price_to_inr(price_str):
     if not price_str:
         return None
@@ -530,7 +572,7 @@ def parse_price_to_inr(price_str):
     if match_inr:
         return float(match_inr.group(2).replace(",", ""))
 
-    # USD → INR
+    # USD -> INR
     match_usd = re.search(r"\$ ?([\d,]+)", price_str)
     if match_usd:
         usd = float(match_usd.group(1).replace(",", ""))
@@ -541,13 +583,13 @@ def parse_price_to_inr(price_str):
 
 @app.route('/compare_items', methods=['POST'])
 def compare_items():
+    item1 = request.form.get('item1', '').strip()
+    item2 = request.form.get('item2', '').strip()
+
+    if not item1 or not item2:
+        return jsonify({'error': "Fill in both sides so there's something to compare."})
+
     try:
-        item1 = request.form.get('item1', '').strip()
-        item2 = request.form.get('item2', '').strip()
-
-        if not item1 or not item2:
-            return jsonify({'error': "⚠️ Please enter both items."})
-
         def clean_query(q):
             if len(q.split()) == 1:
                 return q + " best price"
@@ -557,7 +599,7 @@ def compare_items():
         data2 = get_product_data(clean_query(item2))
 
         if not data1 or not data2:
-            return jsonify({'error': "⚠️ Try more specific product names (e.g., 'MacBook Air M2')"})
+            return jsonify({'error': "Couldn't find one of those. Try the exact model name, like \"MacBook Air M2\"."})
 
         p1 = parse_price_to_inr(data1.get("price"))
         p2 = parse_price_to_inr(data2.get("price"))
@@ -576,8 +618,9 @@ def compare_items():
         })
 
     except Exception as e:
-        print("❌ Compare error:", e)
+        print("Compare error:", e)
         return jsonify(build_compare_fallback(item1, item2))
+
 
 if __name__ == '__main__':
     port = int(os.getenv("PORT", "5000"))

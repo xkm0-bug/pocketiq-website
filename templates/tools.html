@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Tools · PocketIQ</title>
+  <meta name="description" content="Two small money calculators for students: how long to save for something, and what a small habit costs in a year." />
+  {% include "partials/head.html" %}
+</head>
+
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  {% include "partials/header.html" %}
+
+  <main id="main" class="page">
+    <div class="wrap">
+      <div class="page-head">
+        <h1>Do the math first</h1>
+        <p>Two small calculators. No AI here, only arithmetic, so the numbers are exact and nothing you
+          type leaves your device. They work in any currency.</p>
+      </div>
+
+      <!-- ============ GOAL PLANNER ============ -->
+      <section class="plate tool" aria-labelledby="goal-title">
+        <form class="tool-form" id="goal-form" novalidate>
+          <h2 class="plate-title" id="goal-title">Goal planner</h2>
+          <p>Want something that costs more than a month of pocket money? See how long it takes.</p>
+
+          <label class="field"><span>What is it</span>
+            <input type="text" id="goal-name" autocomplete="off" placeholder="e.g. headphones" maxlength="40" /></label>
+
+          <label class="field"><span>What it costs</span>
+            <span class="input-num"><input type="text" inputmode="numeric" id="goal-price" value="6000"
+                autocomplete="off" /></span></label>
+
+          <div class="field-row">
+            <label class="field"><span>Saved so far</span>
+              <span class="input-num"><input type="text" inputmode="numeric" id="goal-saved" value="0"
+                  autocomplete="off" /></span></label>
+            <label class="field"><span>You can save a month</span>
+              <span class="input-num"><input type="text" inputmode="numeric" id="goal-monthly" value="500"
+                  autocomplete="off" /></span></label>
+          </div>
+        </form>
+
+        <div class="tool-out">
+          <span class="silk">Time to get there</span>
+          <div class="big-num"><b id="goal-readout">12</b><span>months</span></div>
+          <p class="note"><span id="goal-date"></span><span id="goal-years" hidden></span></p>
+          <div class="xp-meter" id="goal-meter" aria-hidden="true"></div>
+          <p class="note" id="goal-meter-note"></p>
+          <p class="answer" id="goal-answer" aria-live="polite"></p>
+          <p class="note" id="goal-faster"></p>
+        </div>
+      </section>
+
+      <!-- ============ HABIT COST ============ -->
+      <section class="plate tool" aria-labelledby="habit-title">
+        <form class="tool-form" id="habit-form" novalidate>
+          <h2 class="plate-title" id="habit-title">The real cost of a habit</h2>
+          <p>Pick something you buy again and again, like a snack, a drink or an in-game top-up. Fill in
+            the boxes below and you'll see what it costs you over a whole year.</p>
+
+          <label class="field"><span>1. How much does it cost each time?</span>
+            <span class="input-num"><input type="text" inputmode="numeric" id="habit-amount" value="15"
+                autocomplete="off" /></span></label>
+
+          <div class="field">
+            <span id="habit-freq-label">2. How often do you buy it?</span>
+            <div class="seg-choice" role="group" aria-labelledby="habit-freq-label">
+              <button type="button" class="key key-out key-sm" data-per="365" aria-pressed="false">Every day</button>
+              <button type="button" class="key key-out key-sm" data-per="220" aria-pressed="true">Every school day</button>
+              <button type="button" class="key key-out key-sm" data-per="52" aria-pressed="false">Once a week</button>
+              <button type="button" class="key key-out key-sm" data-per="12" aria-pressed="false">Once a month</button>
+            </div>
+          </div>
+
+          <label class="field"><span>3. How much money do you get a month? (optional)</span>
+            <span class="input-num"><input type="text" inputmode="numeric" id="habit-income" value="1500"
+                autocomplete="off" /></span></label>
+          <p class="note">Only used to show how many months of your money this habit takes.</p>
+        </form>
+
+        <div class="tool-out">
+          <span class="silk">This habit costs you</span>
+          <div class="big-num"><b id="habit-readout">3,300</b><span>a year</span></div>
+          <p class="note" id="habit-times"></p>
+          <p class="answer" id="habit-answer" aria-live="polite"></p>
+          <p class="note" id="habit-note"></p>
+        </div>
+      </section>
+
+      <div class="keys">
+        <a class="key" href="/mobo/decision">Ask MoBo about a purchase</a>
+        <a class="key" href="/mobo/learning">Back to my roadmap</a>
+      </div>
+    </div>
+  </main>
+
+  {% include "partials/footer.html" %}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const el = (id) => document.getElementById(id);
+      const num = (id) => Math.max(0, Number(String(el(id).value).replace(/[^\d.]/g, "")) || 0);
+      const money = (n) => Math.round(n).toLocaleString("en-US");
+      const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+      /* ---------- goal planner ---------- */
+      const drawGoal = (n) => { el("goal-readout").textContent = n === null ? "?" : n; };
+
+      function goal() {
+        const name = el("goal-name").value.trim() || "it";
+        const price = num("goal-price");
+        const saved = num("goal-saved");
+        const monthly = num("goal-monthly");
+        const left = price - saved;
+        const meter = el("goal-meter");
+
+        const blank = (msg) => {
+          drawGoal(null);
+          el("goal-date").textContent = "";
+          el("goal-years").textContent = "";
+          meter.innerHTML = "";
+          el("goal-meter-note").textContent = "";
+          el("goal-answer").textContent = msg;
+          el("goal-faster").textContent = "";
+        };
+
+        if (!price) return blank("Put in what it costs to get started.");
+        if (left <= 0) {
+          blank(`You already have enough for ${name}. Whether to buy it is a different question, and MoBo's Decision mode is good at that one.`);
+          drawGoal(0);
+          return;
+        }
+        if (!monthly) return blank(`You still need ${money(left)}. Add what you can save each month to see how long that takes.`);
+
+        const months = Math.ceil(left / monthly);
+        drawGoal(months);
+
+        const when = new Date();
+        when.setMonth(when.getMonth() + months);
+        el("goal-date").textContent = "That's around " + when.toLocaleDateString("en-IN", { month: "long", year: "numeric" }) + ".";
+        const yrs = months / 12;
+        el("goal-years").textContent = months < 12 ? "under a year"
+          : months % 12 === 0 ? plural(yrs, "year") : `about ${yrs.toFixed(1)} years`;
+
+        // one cell per tenth of the price, lit for what's already saved
+        const lit = Math.floor((saved / price) * 10);
+        meter.innerHTML = Array.from({ length: 10 }, (_, i) => `<i class="${i < lit ? "on" : ""}"></i>`).join("");
+        el("goal-meter-note").textContent = saved
+          ? `${money(saved)} of ${money(price)} saved. ${money(left)} to go.`
+          : `${money(left)} to go.`;
+
+        el("goal-answer").innerHTML =
+          `Saving <b>${money(monthly)}</b> a month, you'd have ${name === "it" ? "it" : "your " + name.replace(/</g, "&lt;")} in <b>${plural(months, "month")}</b>.`;
+
+        if (months > 999) {
+          el("goal-faster").textContent = "That's a very long time. A bigger monthly amount, or a cheaper version, would make this a real plan.";
+        } else if (months > 2) {
+          // what it would take to get there in two thirds of the time
+          const target = Math.max(1, Math.round(months * 2 / 3));
+          const needed = Math.ceil(left / target / 10) * 10;
+          el("goal-faster").textContent =
+            `Want it sooner? ${money(needed)} a month gets you there in ${plural(Math.ceil(left / needed), "month")}. A cheaper version or a sale does the same job.`;
+        } else {
+          el("goal-faster").textContent = "That's close. Keep the money somewhere separate so it's still there when you need it.";
+        }
+      }
+
+      ["goal-name", "goal-price", "goal-saved", "goal-monthly"].forEach(id => el(id).addEventListener("input", goal));
+      el("goal-form").addEventListener("submit", e => e.preventDefault());
+      goal();
+
+      /* ---------- what it adds up to ---------- */
+      const drawHabit = (n) => { el("habit-readout").textContent = n === null ? "?" : money(n); };
+      const freqKeys = [...document.querySelectorAll(".seg-choice .key")];
+
+      function habit() {
+        const amount = num("habit-amount");
+        const income = num("habit-income");
+        const per = Number(freqKeys.find(k => k.getAttribute("aria-pressed") === "true").dataset.per);
+
+        if (!amount) {
+          drawHabit(null);
+          el("habit-times").textContent = "";
+          el("habit-answer").textContent = "Start with box 1: what does it cost each time you buy it?";
+          el("habit-note").textContent = "";
+          return;
+        }
+
+        const year = amount * per;
+        drawHabit(year);
+        const UNITS = { 365: "days", 220: "school days", 52: "weeks", 12: "months" };
+        el("habit-times").textContent = `${money(amount)} × ${per} ${UNITS[per]} in a year.`;
+        el("habit-answer").innerHTML = `Over five years that's <b>${money(year * 5)}</b>.`;
+
+        const bits = [];
+        if (income) {
+          const monthsWorth = year / income;
+          bits.push(monthsWorth >= 1
+            ? `That's ${monthsWorth.toFixed(1)} months of your money every year, on this one thing.`
+            : `That's about ${Math.round(monthsWorth * 100)}% of one month of your money, spread over the year.`);
+        }
+        bits.push("You don't have to stop. Now you know the price, so it's a choice instead of a leak.");
+        el("habit-note").textContent = bits.join(" ");
+      }
+
+      freqKeys.forEach(k => k.addEventListener("click", () => {
+        freqKeys.forEach(o => o.setAttribute("aria-pressed", String(o === k)));
+        habit();
+      }));
+      ["habit-amount", "habit-income"].forEach(id => el(id).addEventListener("input", habit));
+      el("habit-form").addEventListener("submit", e => e.preventDefault());
+      habit();
+    });
+  </script>
+</body>
+
+</html>

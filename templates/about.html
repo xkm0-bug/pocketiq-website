@@ -2,149 +2,119 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>About • PocketIQ</title>
-  <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/static/ui.css" />
+  <title>About · PocketIQ</title>
+  <meta name="description" content="Why a high school student built a money mentor for people whose budget is pocket money." />
+  {% include "partials/head.html" %}
 </head>
 
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   {% include "partials/header.html" %}
 
-  <main>
-    <!-- HERO -->
-    <section class="pq-wrap about-hero">
-      <div>
-        <span class="eyebrow">About</span>
-        <h1>I got tired of money advice written for adults</h1>
-        <p class="lede">
-          Everything I found about saving or investing assumed you had a salary, a credit score
-          and a tax bracket. I had pocket money and a lot of questions. PocketIQ is what I wish
-          I'd had instead.
-        </p>
-        <div class="hp-cta">
-          <a href="/mobo/learning" class="pq-btn lg">Try it yourself →</a>
-        </div>
-      </div>
+  <main id="main" class="page">
+    <div class="wrap stack" style="gap:clamp(1.5rem, 1rem + 2vw, 2.5rem)">
 
-      <div class="about-card">
-        <span class="quote-mark">"</span>
-        <p>
-          If a fifteen-year-old can't follow your explanation of compound interest, the problem
-          isn't the fifteen-year-old.
-        </p>
-        <div class="about-sign">
-          <div class="sign-avatar">K</div>
-          <div>
-            <strong>Kalash</strong>
-            <span>High school student, built PocketIQ</span>
+      <section class="about-top">
+        <div>
+          <h1>I got tired of money advice written for adults.</h1>
+          <p class="lede">Everything I found about saving or investing assumed I had a
+            salary, a credit score and a tax bracket. I had pocket money and a lot of questions. PocketIQ is
+            the thing I wanted and couldn't find.</p>
+          <div class="keys">
+            <a class="key key-run" href="/mobo/learning">Try it yourself <svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- STATS -->
-    <section class="pq-wrap">
-      <div class="stat-band">
-        <div><strong>3</strong><span>AI modes</span></div>
-        <div><strong>1</strong><span>Person building it</span></div>
-        <div><strong>₹0</strong><span>Cost to users</span></div>
-        <div><strong>0</strong><span>Ads or trackers</span></div>
-      </div>
-    </section>
+        <blockquote class="plate quote">
+          <p>If a fifteen-year-old can't follow your explanation of compound interest, the problem isn't the
+            fifteen-year-old.</p>
+          <footer>Kalash, high school student</footer>
+        </blockquote>
+      </section>
 
-    <!-- STORY -->
-    <section class="pq-wrap pq-section">
-      <div class="section-head">
-        <h2>Why this exists</h2>
-        <p>Two problems kept showing up, so I built something for each.</p>
-      </div>
+      <section aria-labelledby="why-title">
+        <h2 class="plate-title" id="why-title" style="margin-bottom:1rem">Why this exists</h2>
+        <div class="two-col">
+          <div class="panel">
+            <h3>Nobody teaches this at the right time</h3>
+            <p>School covers plenty of things you'll use one day. It mostly skips the ones you need next
+              week: whether to buy the thing, how to make your money last the month, why the same phone costs
+              more on one site than another.</p>
+            <p>By the time most people learn it, they already have habits that are annoying to undo. Starting
+              at 15 is easier than fixing it at 25.</p>
+          </div>
+          <div class="panel">
+            <h3>The advice that exists doesn't fit</h3>
+            <p>It's either too basic to help ("save more") or it assumes you already know what an expense
+              ratio is. Neither one gets you any closer to a decision.</p>
+            <p>MoBo goes the other way. It asks about your actual situation, uses amounts you'd recognise,
+              and gives you something you can do today.</p>
+          </div>
+        </div>
+      </section>
 
-      <div class="prose-grid">
-        <div class="prose-card">
-          <h3>Nobody teaches this at the right time</h3>
-          <p>
-            School covers a lot of things you'll use eventually. It mostly skips the ones you'll
-            use next week: whether to buy the thing, how to make ₹500 last the month, why the
-            same phone costs so differently across two sites.
-          </p>
-          <p>
-            By the time most people learn it, they've already picked up habits that are annoying
-            to undo. Starting earlier is easier than fixing it later.
-          </p>
+      <section aria-labelledby="rules-title">
+        <h2 class="plate-title" id="rules-title" style="margin-bottom:1rem">Three rules I keep coming back to</h2>
+        <div class="three-col">
+          <div class="panel">
+            <span class="rule-num">1</span>
+            <h3>Plain words</h3>
+            <p>If a word needs a glossary, the sentence needs rewriting. Lessons use things you actually run
+              into: phone bills, snacks, subscriptions, a first job.</p>
+          </div>
+          <div class="panel">
+            <span class="rule-num">2</span>
+            <h3>Built around you</h3>
+            <p>Your roadmap comes from what you wrote about yourself. Two people who start in different
+              places get different paths.</p>
+          </div>
+          <div class="panel">
+            <span class="rule-num">3</span>
+            <h3>Honest over pushy</h3>
+            <p>MoBo isn't selling anything and doesn't earn a cut. Sometimes the right answer is "wait and
+              save", and it says so.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="two-col" aria-label="Details">
+        <div class="plate">
+          <h2 class="plate-title" style="margin-bottom:1.1rem">The honest details</h2>
+          <dl class="facts" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+            <div><dt>Built by</dt><dd>One student</dd></div>
+            <div><dt>Cost</dt><dd>Free to use</dd></div>
+            <div><dt>Ads and trackers</dt><dd>None</dd></div>
+            <div><dt>Sign-up</dt><dd>None</dd></div>
+            <div><dt>Lessons</dt><dd>Written by AI when you open them</dd></div>
+            <div><dt>Your progress</dt><dd>Saved in your browser only</dd></div>
+          </dl>
+          <p class="note" style="margin-top:1.1rem">PocketIQ explains how money works. It doesn't give
+            investment tips, so talk to an adult you trust before any big decision.</p>
+          <div style="margin-top:1.25rem;padding-top:1.1rem;border-top:1px solid var(--line)">
+            <span class="silk" style="display:block;margin-bottom:.6rem">What it's made of</span>
+            <ul class="parts">
+              <li>Python</li>
+              <li>Flask</li>
+              <li>OpenAI API</li>
+              <li>SerpAPI</li>
+              <li>Plain JavaScript</li>
+              <li>CSS</li>
+            </ul>
+          </div>
         </div>
 
-        <div class="prose-card">
-          <h3>The advice that does exist is unusable</h3>
-          <p>
-            It's either too basic to help ("save more!") or written in a language that assumes
-            you already know what an expense ratio is. Neither one gets you closer to a decision.
-          </p>
-          <p>
-            MoBo goes the other way. It asks about your actual situation, uses numbers you
-            recognise, and gives you something you can act on today.
-          </p>
+        <div class="plate">
+          <h2 class="plate-title" style="margin-bottom:1.1rem">What's on it</h2>
+          <div class="link-list">
+            <a href="/mobo/learning"><b>Learn</b><span>A roadmap of short lessons built around you.</span><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
+            <a href="/mobo/decision"><b>Decide</b><span>Ask MoBo whether something is worth buying.</span><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
+            <a href="/mobo/compare"><b>Compare</b><span>Two things side by side with live prices.</span><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
+            <a href="/tools"><b>Tools</b><span>A goal planner and a habit cost calculator.</span><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- PRINCIPLES -->
-    <section class="pq-wrap pq-section">
-      <div class="section-head">
-        <h2>How I've tried to build it</h2>
-        <p>A few rules I keep coming back to.</p>
-      </div>
-
-      <div class="value-grid">
-        <div class="value-card">
-          <div class="value-ico">🗣️</div>
-          <h4>Plain language, always</h4>
-          <p>If a word needs a glossary, it needs a better sentence. Every lesson uses examples
-            you'd actually run into: recharges, snacks, subscriptions, a first job.</p>
-        </div>
-
-        <div class="value-card">
-          <div class="value-ico">🎯</div>
-          <h4>Built around you</h4>
-          <p>Your roadmap comes from what you wrote about yourself, not a fixed syllabus. Two
-            people describing different starting points get genuinely different paths.</p>
-        </div>
-
-        <div class="value-card">
-          <div class="value-ico">🤝</div>
-          <h4>Honest, not pushy</h4>
-          <p>MoBo isn't selling anything and doesn't get a cut. Sometimes the right answer is
-            "wait and save", and it'll say that.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- TECH -->
-    <section class="pq-wrap pq-section">
-      <div class="section-head">
-        <h2>What it's made of</h2>
-        <p>A student project, built in the open, still very much a work in progress.</p>
-      </div>
-
-      <div class="tech-row">
-        <span class="tech-chip">Python</span>
-        <span class="tech-chip">Flask</span>
-        <span class="tech-chip">OpenAI API</span>
-        <span class="tech-chip">SerpAPI</span>
-        <span class="tech-chip">Vanilla JS</span>
-        <span class="tech-chip">Hand-written CSS</span>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="pq-wrap">
-      <div class="cta-band">
-        <h2>Have a look for yourself</h2>
-        <p>Start with a roadmap, or just ask MoBo whether that thing in your cart is worth it.</p>
-        <a href="/mobo/learning" class="pq-btn lg on-dark">Open PocketIQ →</a>
-      </div>
-    </section>
+    </div>
   </main>
 
   {% include "partials/footer.html" %}

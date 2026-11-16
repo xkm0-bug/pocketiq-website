@@ -2,147 +2,151 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PocketIQ • Money skills for the next generation</title>
-  <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/static/ui.css" />
+  <title>PocketIQ · Money skills you'll actually use this year</title>
+  <meta name="description" content="A money mentor for students on pocket money. MoBo builds you a roadmap of short lessons around your situation." />
+  {% include "partials/head.html" %}
 </head>
 
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   {% include "partials/header.html" %}
 
-  <main>
-    <!-- HERO -->
-    <section class="pq-wrap hp-hero">
-      <div>
-        <span class="eyebrow">Your AI money mentor</span>
-        <h1>Money skills you'll actually <span class="accent">use this year</span></h1>
-        <p class="lede">
-          Most money advice is written for people who already have money. PocketIQ isn't.
-          Learn the basics at your own pace, get a second opinion before you buy something,
-          and find out what things really cost.
-        </p>
-
-        <div class="hp-cta">
-          <a href="/mobo/learning" class="pq-btn lg">Start learning free →</a>
-          <a href="/mobo/decision" class="pq-btn lg ghost">Talk to the decision coach</a>
-        </div>
-
-        <div class="hp-trust">
-          <span><b class="hp-tick">✓</b> No account, no email</span>
-          <span><b class="hp-tick">✓</b> Everything in rupees</span>
-          <span><b class="hp-tick">✓</b> Free to use</span>
-        </div>
-      </div>
-
-      <div class="hp-mock" aria-hidden="true">
-        <div class="mock-bar">
-          <div class="mock-level">2</div>
-          <div class="mock-xp">
-            <div class="mock-xp-top"><strong>Savings Starter</strong><span>135 / 200 XP</span></div>
-            <div class="mock-track"><div class="mock-fill"></div></div>
+  <main id="main">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <h1>Money skills you'll actually use <mark>this year</mark>.</h1>
+          <p class="lede">Most money advice assumes you have a salary. PocketIQ is for people whose budget is
+            pocket money. Tell MoBo where you're at and it builds short lessons around you.</p>
+          <div class="keys">
+            <a class="key key-run key-xl" href="/mobo/learning">Build my roadmap <svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
+            <a class="key key-xl" href="/mobo/decision">Should I buy this?</a>
           </div>
+          <ul class="hero-facts">
+            <li>Free</li>
+            <li>No sign-up</li>
+            <li>Lessons take about 2 minutes</li>
+          </ul>
         </div>
 
-        <div class="mock-step">
-          <div class="mock-dot done">✓</div>
-          <div class="mock-txt"><strong>Understand Your Income</strong><span>Done · +100 XP</span></div>
-        </div>
-        <div class="mock-step">
-          <div class="mock-dot done">✓</div>
-          <div class="mock-txt"><strong>Know Your Expenses</strong><span>Done · +100 XP</span></div>
-        </div>
-        <div class="mock-step active">
-          <div class="mock-dot now">3</div>
-          <div class="mock-txt"><strong>Set Financial Goals</strong><span>Next up</span></div>
-        </div>
-
-        <div class="mock-chat">
-          <strong>MOBO ASSISTANT</strong>
-          <p>"Say you want ₹6,000 headphones. Put aside ₹500 a month and they're yours in a year,
-            without touching your savings."</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- STATS -->
-    <section class="pq-wrap">
-      <div class="stat-band">
-        <div><strong>3</strong><span>Modes to work with</span></div>
-        <div><strong>8-10</strong><span>Steps in a roadmap</span></div>
-        <div><strong>2 min</strong><span>Per lesson, roughly</span></div>
-        <div><strong>₹0</strong><span>To get started</span></div>
-      </div>
-    </section>
-
-    <!-- FEATURES -->
-    <section class="pq-wrap pq-section">
-      <div class="section-head">
-        <h2>Three tools, one mentor</h2>
-        <p>Each mode handles a different money problem, from learning the basics to
-          talking yourself out of a bad buy.</p>
-      </div>
-
-      <div class="card-grid-3">
-        <article class="feature-card">
-          <div class="feature-ico">📘</div>
-          <h3>Learning Mode</h3>
-          <p>Tell MoBo what you already know and it builds a roadmap around it. Short lessons,
-            XP for finishing them, and a streak worth keeping.</p>
-          <a class="text-link" href="/mobo/learning">Start learning <span>→</span></a>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-ico">🧠</div>
-          <h3>Decision Mode</h3>
-          <p>About to buy something? MoBo asks the questions a sensible friend would, then tells
-            you straight: go for it, think twice, or wait and save.</p>
-          <a class="text-link" href="/mobo/decision">Get a verdict <span>→</span></a>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-ico">⚖️</div>
-          <h3>Compare Mode</h3>
-          <p>Put two things side by side with live prices and see the trade-off in plain terms:
-            how many of one your money could buy instead.</p>
-          <a class="text-link" href="/mobo/compare">Compare prices <span>→</span></a>
-        </article>
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section class="pq-wrap pq-section">
-      <div class="section-head">
-        <h2>How it works</h2>
-        <p>No lectures, no jargon, no 40-page PDF nobody finishes.</p>
-      </div>
-
-      <div class="step-grid">
-        <div class="numbered-step">
-          <h3>Say where you're at</h3>
-          <p>Write two lines about what you understand today. That's the whole setup. No quiz,
-            no sign-up form.</p>
-        </div>
-        <div class="numbered-step">
-          <h3>Get your roadmap</h3>
-          <p>MoBo maps out 8 to 10 steps from where you are to where you want to be, and writes
-            each lesson around your situation.</p>
-        </div>
-        <div class="numbered-step">
-          <h3>Learn and level up</h3>
-          <p>Finish a step, earn XP, unlock the next one. Ask MoBo anything along the way and
-            keep the streak going.</p>
+        <div class="plate" aria-label="A sample roadmap">
+          <div class="preview-head">
+            <span class="silk">A sample roadmap</span>
+            <span><b>200</b> XP · Level 2</span>
+          </div>
+          <div class="rail-steps">
+            <div class="rail-step done">
+              <span class="rail-dot"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10.5l3.2 3.2L15 6.5"/></svg></span>
+              <span><span class="rail-title">Know your pocket money</span>
+                <span class="rail-sub">Add up everything that actually comes in each month.</span></span>
+            </div>
+            <div class="rail-step done">
+              <span class="rail-dot"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10.5l3.2 3.2L15 6.5"/></svg></span>
+              <span><span class="rail-title">Track a week of spending</span>
+                <span class="rail-sub">A small snack every school day adds up to more than you think.</span></span>
+            </div>
+            <div class="rail-step current active">
+              <span class="rail-dot">3</span>
+              <span><span class="rail-title">Needs versus wants</span>
+                <span class="rail-sub">Your phone bill is a need. A third pair of earbuds is a want.</span>
+                <span class="rail-flag">Next up</span></span>
+            </div>
+            <div class="rail-step locked">
+              <span class="rail-dot">4</span>
+              <span><span class="rail-title">The 24-hour rule</span>
+                <span class="rail-sub">Wait a day before any big buy you didn't plan.</span></span>
+            </div>
+          </div>
+          <p class="note" style="margin-top:.75rem">Yours will be different. It's built from what you tell MoBo.</p>
         </div>
       </div>
     </section>
 
-    <!-- CTA -->
-    <section class="pq-wrap">
-      <div class="cta-band">
-        <h2>Money makes sense when someone explains it properly.</h2>
-        <p>Your first roadmap takes about a minute to build. Nothing to sign up for.</p>
-        <a href="/mobo/learning" class="pq-btn lg on-dark">Build my roadmap →</a>
+    <section class="section" aria-labelledby="modes-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="modes-title">What do you need right now?</h2>
+          <p>Four things, each for a different money problem. Pick the one that sounds like you.</p>
+        </div>
+
+        <div class="mode-grid">
+          <a class="mode-card" href="/mobo/learning">
+            <span class="mode-q">"I don't really get money."</span>
+            <h3>Learn</h3>
+            <p>A roadmap of 8 to 10 short lessons, built from what you already know. Each one earns XP.</p>
+            <span class="go">Start learning <svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></span>
+          </a>
+          <a class="mode-card" href="/mobo/decision">
+            <span class="mode-q">"Should I buy this?"</span>
+            <h3>Decide</h3>
+            <p>MoBo asks a few questions, then tells you straight: go for it, think twice, or wait and save.</p>
+            <span class="go">Get a verdict <svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></span>
+          </a>
+          <a class="mode-card" href="/mobo/compare">
+            <span class="mode-q">"Which one's worth it?"</span>
+            <h3>Compare</h3>
+            <p>Two things side by side with live prices, and how many of one the other is worth.</p>
+            <span class="go">Compare prices <svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></span>
+          </a>
+          <a class="mode-card" href="/tools">
+            <span class="mode-q">"How long will it take?"</span>
+            <h3>Tools</h3>
+            <p>Two quick calculators: how long to save for something, and what a small habit costs in a year.</p>
+            <span class="go">Open the tools <svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="how-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="how-title">How learning works</h2>
+          <p>Setup takes about a minute. After that it's one short lesson at a time.</p>
+        </div>
+
+        <ol class="steps3">
+          <li>
+            <h3>Say where you're at</h3>
+            <p>Write a couple of lines, or tap through a few quick questions. There's no sign-up form.</p>
+          </li>
+          <li>
+            <h3>Get your roadmap</h3>
+            <p>MoBo plans 8 to 10 steps from where you are, and writes each lesson around your situation.</p>
+          </li>
+          <li>
+            <h3>Learn and level up</h3>
+            <p>Finishing a step earns 100 XP and unlocks the next. You can ask MoBo anything on the way.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="facts-title">
+      <div class="wrap">
+        <div class="plate">
+          <h2 class="plate-title" id="facts-title" style="margin-bottom:1.25rem">The short version</h2>
+          <dl class="facts">
+            <div><dt>Steps in a roadmap</dt><dd>8 to 10</dd></div>
+            <div><dt>Time per lesson</dt><dd>About 2 minutes</dd></div>
+            <div><dt>Cost</dt><dd>Free</dd></div>
+            <div><dt>Sign-up</dt><dd>None. No account, no email.</dd></div>
+            <div><dt>Your mentor</dt><dd>MoBo, an AI</dd></div>
+            <div><dt>Built by</dt><dd>Kalash, a high school student</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="cta-band">
+          <div>
+            <h2>Ready when you are.</h2>
+            <p>Your first roadmap takes about a minute to build.</p>
+          </div>
+          <a class="key key-run key-xl" href="/mobo/learning">Build my roadmap <svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
+        </div>
       </div>
     </section>
   </main>

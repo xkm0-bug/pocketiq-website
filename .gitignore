@@ -226,3 +226,18 @@ flask_session/
 
 # The template has no secrets and should be committed
 !.env.example
+
+# CSS toolkit (dev tooling, not app code)
+css-dev-skills/
+.claude/skills/
+
+# Impeccable: machine-local hook manifest and live-mode runtime state
+.claude/settings.local.json
+.impeccable/live/sessions/
+.impeccable/live/inject-journal.json
+
+# Impeccable review captures (regenerated per round)
+.impeccable/review/
+
+# macOS junk (Finder writes these into any folder you open)
+.DS_Store
